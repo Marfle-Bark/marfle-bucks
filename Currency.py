@@ -4,11 +4,12 @@ class Currency(object):
     def __init__(self, amount=None):
         self._uDollars = 0 # Number of micro-USD (for precision)
         if type(amount) is type(self):
-            self._uDollars = amount.getAmount()
+            self._uDollars = amount.getExactAmount()
         elif amount is not None:
             self._uDollars = int(round(amount * 1000000))
 
-    def getAmount(self): return self._uDollars
+    def getExactAmount(self): return self._uDollars
+    def getApproxAmount(self): return float("{:1,.2f}".format(self._uDollars / 1000000.0)) # This is a dirty hack
     def toString(self): return "$" + "{:1,.2f}".format(self._uDollars / 1000000.0)
 
     def getDollarPart(self): return self._uDollars / 1000000
@@ -17,12 +18,12 @@ class Currency(object):
     def add(self, other):
         if type(other) is not type(self):
             other = Currency(other)
-        self._uDollars += other.getAmount()
+        self._uDollars += other.getExactAmount()
 
     def sub(self, other):
         if type(other) is not type(self):
             other = Currency(other)
-        self._uDollars -= other.getAmount()
+        self._uDollars -= other.getExactAmount()
 
     def mul(self, factor):
         self._uDollars *= factor
@@ -32,12 +33,13 @@ class Currency(object):
         self._uDollars /= factor
         self._uDollars = int(round(self._uDollars))
 
-    def __lt__(self, other): pass
-    def __le__(self, other): pass
-    def __eq__(self, other): return self._uDollars == other.getAmount()
-    def __ne__(self, other): return not self.__eq__(other)
-    def __gt__(self, other): pass
-    def __ge__(self, other): pass
+    # Comparisons are defined as approximate: it only checks down to $0.01, NOT micro-dollars!
+    def __lt__(self, other): return type(self) == type(other) and self.getApproxAmount() < other.getApproxAmount()
+    def __le__(self, other): return self < other or self == other
+    def __eq__(self, other): return type(self) == type(other) and self.getApproxAmount() == other.getApproxAmount()
+    def __ne__(self, other): return not self == other
+    def __gt__(self, other): return type(self) == type(other) and self.getApproxAmount() > other.getApproxAmount()
+    def __ge__(self, other): return self > other or self == other
 
 
 
@@ -45,6 +47,7 @@ if __name__ == "__main__":
     print "Note: this class simulates down to micro-dollars to reduce rounding error."
     print "Also, right now this class ONLY handles USD and all output is formatted with regards to that."
     print "It doesn't yet do conversion of any kind, so you'll need to write your own glue code."
+    print "ALSO COMPARISONS ARE APPROXIMATE"
     print "Made with <3 by Ethan Busbee for his own learning."
     print ""
 
@@ -72,19 +75,32 @@ if __name__ == "__main__":
     print "Dollars: " + str(dough.getDollarPart())
     print "Cents: " + str(dough.getCentPart())
 
+    # Comparison Operators
     cash = Currency(10)
     money = Currency()
     money.add(5.50)
     money.add(5)
     money.sub(0.50)
-
     # cash and money should both be $10.00 at this point
 
-    print "***Check for equality and inequality (same numbers):"
+    print "***Compare $10.00 == $10.00 and $10.00 != $10.01:"
     print cash == money
     print cash != money
 
-    print "***Check for equality and inequality (differing numbers):"
+    print "***Compare $10.00 == $10.01 and $10.00 != $10.01:"
     money.add(0.01) # make money be slightly higher than cash
     print cash == money
     print cash != money
+
+    print "***Compare $10.01 < $10.00:"
+    print money < cash
+
+    print "***Compare $10.00 < $10.00:"
+    print cash < money
+
+    money.sub(0.01)
+    print "***Compare $10.00 <= $10.00:"
+    print cash <= money
+
+    print "***Compare $10.00 >= $10.00"
+    print cash >= money
