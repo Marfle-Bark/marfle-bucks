@@ -1,6 +1,6 @@
 __author__ = 'Ethan Busbee'
 
-class Currency:
+class Currency(object):
     def __init__(self, amount=None):
         self._uDollars = 0 # Number of micro-USD (for precision)
         if type(amount) is type(self):
@@ -32,6 +32,15 @@ class Currency:
         self._uDollars /= factor
         self._uDollars = int(round(self._uDollars))
 
+    def __lt__(self, other): pass
+    def __le__(self, other): pass
+    def __eq__(self, other): return self._uDollars == other.getAmount()
+    def __ne__(self, other): return not self.__eq__(other)
+    def __gt__(self, other): pass
+    def __ge__(self, other): pass
+
+
+
 if __name__ == "__main__":
     print "Note: this class simulates down to micro-dollars to reduce rounding error."
     print "Also, right now this class ONLY handles USD and all output is formatted with regards to that."
@@ -62,3 +71,20 @@ if __name__ == "__main__":
     print "***Show dollars and cents separately."
     print "Dollars: " + str(dough.getDollarPart())
     print "Cents: " + str(dough.getCentPart())
+
+    cash = Currency(10)
+    money = Currency()
+    money.add(5.50)
+    money.add(5)
+    money.sub(0.50)
+
+    # cash and money should both be $10.00 at this point
+
+    print "***Check for equality and inequality (same numbers):"
+    print cash == money
+    print cash != money
+
+    print "***Check for equality and inequality (differing numbers):"
+    money.add(0.01) # make money be slightly higher than cash
+    print cash == money
+    print cash != money
