@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print "***Add $10: " + str(dough)
 
     dough -= 5.00
-    print "***Remove $5.00: " + str(dough)
+    print "***Subtract $5.00: " + str(dough)
 
     dough *= 5
     print "***Multiply by 5x: " + str(dough)
@@ -66,8 +66,8 @@ if __name__ == "__main__":
     dough /= 5
     print "***Divide by 5x: " + str(dough)
 
-    print "***Show dollars and cents separately."
-    print "Dollars: " + str(dough.getDollarPart()) + ", Cents: " + str(dough.getCentPart())
+    print "***Show dollars and cents separately:"
+    print "***Dollars: " + str(dough.getDollarPart()) + ", Cents: " + str(dough.getCentPart())
 
     # Comparison Operators
     cash = Currency(10)
